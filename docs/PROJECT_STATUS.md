@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-09-07  
 **Operating mode:** Continuous autonomy per `AGENTS.md`  
-**Current lifecycle stage:** 07 — Implementation Planning
+**Current lifecycle stage:** 08 — Foundation
 
 ## Lifecycle gates
 
@@ -14,8 +14,8 @@
 | 04 | `docs/USER_FLOWS.md` | PASS |
 | 05 | `docs/ARCHITECTURE.md` | FALLBACK — PASS (`gpt-5.6-sol`; Astra unavailable) |
 | 06 | `docs/DATABASE.md` | FALLBACK — PASS (`gpt-5.6-sol`; Astra unavailable) |
-| 07 | `docs/IMPLEMENTATION_PLAN.md` | IN PROGRESS |
-| 08 | Foundation | NOT STARTED |
+| 07 | `docs/IMPLEMENTATION_PLAN.md` | PASS |
+| 08 | Foundation | IN PROGRESS |
 | 09 | App shell/navigation | NOT STARTED |
 | 10 | First real vertical slice | NOT STARTED |
 | 11 | Audit #1 | NOT STARTED |
@@ -30,6 +30,17 @@ KARE is a mobile-first personal cinema library, curated discovery surface and ex
 ## Approved technical direction
 Expo/React Native/TypeScript + Expo Router; Supabase Auth/Postgres/Edge Functions with grants + RLS; TMDB behind Edge Functions; TanStack Query; deterministic recommendation engine; selective offline read cache; no offline write queue.
 
+## Stage 07 gate evidence
+`docs/IMPLEMENTATION_PLAN.md` is dependency ordered, gives task IDs, purpose, work, affected areas, dependencies, acceptance criteria, verification, complexity/risk, identifies VS-1 explicitly and is consistent with the approved planning artifacts. Stage 07 therefore passes and the repository may enter implementation.
+
+## Stage 08 progress
+- Working branch: `feat/foundation`.
+- Approved UI concept image added at `docs/assets/kare-ui-concept.jpg`.
+- Current Expo SDK family re-verified against first-party Expo sources on 2026-09-07: SDK 57 / React Native 0.86.3 / React 19.2.3; default template uses Expo Router + TypeScript under `src/app`.
+- Local runtime has Node `v22.16.0` and npm `10.9.2`.
+- `npx create-expo-app@latest ...` / npm registry access is currently blocked in this execution environment by DNS (`EAI_AGAIN registry.npmjs.org`). This prevents a real generated install/lockfile and full lint/typecheck/test/export execution until package network access is available.
+- Repository-safe foundation work continues using the current official Expo SDK 57 template as the version authority; verification that requires installed dependencies will be marked PARTIAL rather than claimed as passed.
+
 ## Gate evidence
 - Architecture review: `docs/reviews/ARCHITECTURE_GATE.md`.
 - Database/RLS review: `docs/reviews/DATABASE_GATE.md`.
@@ -42,4 +53,4 @@ Expo/React Native/TypeScript + Expo Router; Supabase Auth/Postgres/Edge Function
 - Store signing/submission credentials and explicit public release action are user-owned later-stage assets/actions.
 
 ## Next eligible action
-Create and gate `docs/IMPLEMENTATION_PLAN.md`, then continue automatically into Phase 0 / Stage 08 foundation if the plan passes.
+Continue Phase 0 from `TASK-000`: add the minimal SDK 57 Expo/Router TypeScript scaffold, then tooling/env/design/error/query/CI foundation. Re-run package-backed verification when dependency network access is available.
