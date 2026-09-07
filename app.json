@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "KARE",
+    "slug": "kare",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "kare",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#101010",
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
