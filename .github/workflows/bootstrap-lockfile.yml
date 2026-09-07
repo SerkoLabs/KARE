@@ -7,6 +7,12 @@ on:
     paths:
       - package.json
       - .github/workflows/bootstrap-lockfile.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - package.json
+      - .github/workflows/bootstrap-lockfile.yml
 
 permissions:
   contents: write
@@ -16,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout feature branch
         uses: actions/checkout@v4
         with:
           ref: feat/foundation
