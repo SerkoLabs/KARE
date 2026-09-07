@@ -6,10 +6,10 @@ import { colors, spacing } from '@/design/tokens';
 
 type StateViewProps = {
   title: string;
-  message?: string;
+  message?: string | undefined;
   kind?: 'loading' | 'empty' | 'error';
   retryLabel?: string;
-  onRetry?: () => void;
+  onRetry?: (() => void) | undefined;
 };
 
 export function StateView({
