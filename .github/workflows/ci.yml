@@ -8,8 +8,13 @@ permissions:
   contents: read
 jobs:
   verify:
+    name: ${{ matrix.gate }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        gate: [lint, typecheck, test, export]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,7 +22,11 @@ jobs:
           node-version: '22.16.0'
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run test:ci
-      - run: npm run export:smoke
+      - if: matrix.gate == 'lint'
+        run: npm run lint
+      - if: matrix.gate == 'typecheck'
+        run: npm run typecheck
+      - if: matrix.gate == 'test'
+        run: npm run test:ci
+      - if: matrix.gate == 'export'
+        run: npm run export:smoke
