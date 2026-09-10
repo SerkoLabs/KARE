@@ -1,0 +1,70 @@
+name: Android preview APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/foundation]
+    paths:
+      - '.github/workflows/android-preview.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  apk:
+    name: Build preview APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build and report
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set +e
+          npm ci --no-audit --no-fund > build.log 2>&1
+          status=$?
+          if [ $status -eq 0 ]; then
+            npx expo prebuild --platform android --no-install --clean >> build.log 2>&1
+            status=$?
+          fi
+          if [ $status -eq 0 ]; then
+            (cd android && ./gradlew assembleRelease --no-daemon) >> build.log 2>&1
+            status=$?
+          fi
+          if [ $status -eq 0 ]; then
+            cp android/app/build/outputs/apk/release/app-release.apk KARE-preview.apk
+          else
+            {
+              printf '## Android preview build failed for `%s`\n\n```text\n' "$GITHUB_SHA"
+              tail -n 160 build.log
+              printf '\n```\n'
+            } > build-comment.md
+            gh pr comment 1 --body-file build-comment.md
+          fi
+          exit $status
+      - name: Upload APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: KARE-preview-apk
+          path: KARE-preview.apk
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: KARE-android-build-log
+          path: build.log
+          retention-days: 14

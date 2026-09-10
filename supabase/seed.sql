@@ -1,0 +1,3 @@
+-- KARE development/test seed.
+-- Keep this file deterministic and non-sensitive.
+-- No fake production movie metadata is seeded at this stage.
