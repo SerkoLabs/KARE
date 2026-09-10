@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#101010" />
+<title>KARE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ============ KARE design tokens ============ */
+:root{
+  --bg-primary:#101010;
+  --bg-surface:#181818;
+  --bg-raised:#212121;
+  --text-primary:#F3F0E8;
+  --text-secondary:#A7A49E;
+  --text-faint:#6f6c67;
+  --accent:#8E1F2D;
+  --accent-soft:#b0303f;
+  --success:#4F8A67;
+  --rating:#D8B35A;
+  --line:rgba(243,240,232,.09);
+  --serif:"DM Serif Display", Georgia, "Times New Roman", serif;
+  --sans:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius-poster:8px;
+  --radius-card:12px;
+  --radius-sheet:22px;
+  --pad:16px;
+  --maxw:520px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  font-family:var(--sans);
+  font-size:15px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+img{max-width:100%}
+::selection{background:var(--accent);color:#fff}
+/* Scrollbars */
+.hscroll::-webkit-scrollbar{height:0}
+::-webkit-scrollbar{width:0}
+
+/* App frame — centered mobile canvas */
+#app{
+  max-width:var(--maxw);
+  margin:0 auto;
+  min-height:100vh;min-height:100dvh;
+  background:var(--bg-primary);
+  position:relative;
+  padding-bottom:calc(74px + env(safe-area-inset-bottom));
+  overflow-x:hidden;
+}
+
+/* ============ Screens ============ */
+.screen{display:none;animation:fade .35s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pad{padding:0 var(--pad)}
+.section-gap{height:32px}
+
+/* ============ Top / greeting ============ */
+.topbar{
+  padding:calc(env(safe-area-inset-top) + 18px) var(--pad) 6px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+}
+.brand{font-family:var(--serif);font-size:26px;letter-spacing:.5px;line-height:1}
+.brand small{color:var(--accent-soft);font-family:var(--serif)}
+.greeting{color:var(--text-secondary);font-size:13px;margin-top:4px}
+.avatar{
+  width:38px;height:38px;border-radius:50%;flex:none;
+  background:linear-gradient(140deg,#3a2429,#8E1F2D);
+  display:grid;place-items:center;font-weight:600;font-size:14px;color:#fff;
+  border:1px solid var(--line);
+}
+
+/* ============ Hero CTA ============ */
+.hero{
+  margin:18px var(--pad) 8px;
+  border-radius:var(--radius-card);
+  padding:22px 20px;
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgba(142,31,45,.55), transparent 55%),
+    linear-gradient(155deg,#1c1416,#151112 60%,#101010);
+  border:1px solid rgba(142,31,45,.35);
+}
+.hero .kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-soft);font-weight:600}
+.hero h2{font-family:var(--serif);font-size:30px;margin:8px 0 4px;line-height:1.02}
+.hero p{color:var(--text-secondary);font-size:13px;margin:0 0 16px;max-width:34ch}
+.hero .film-strip{position:absolute;right:-30px;top:-20px;opacity:.14;font-size:150px;line-height:.7;font-family:var(--serif)}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 18px;border-radius:var(--radius-card);font-weight:600;font-size:15px;
+  transition:transform .12s ease, background .2s, opacity .2s;width:100%;
+}
+.btn:active{transform:scale(.975)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:active{background:var(--accent-soft)}
+.btn-secondary{background:var(--bg-raised);color:var(--text-primary);border:1px solid var(--line)}
+.btn-ghost{background:transparent;color:var(--text-secondary);width:auto;padding:10px 4px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn-row{display:flex;gap:10px}
+
+/* ============ Section headers ============ */
+.sec-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:0 var(--pad);margin:26px 0 12px;
+}
+.sec-head h3{font-family:var(--serif);font-size:20px;margin:0;font-weight:400}
+.sec-head .sub{color:var(--text-secondary);font-size:12px}
+
+/* ============ Poster ============ */
+.poster{
+  position:relative;aspect-ratio:2/3;border-radius:var(--radius-poster);
+  overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:10px;color:#fff;isolation:isolate;
+  box-shadow:0 6px 18px rgba(0,0,0,.4);
+  transition:transform .14s ease;
+  border:1px solid rgba(255,255,255,.06);
+}
+.poster:active{transform:scale(.97)}
+.poster::before{content:"";position:absolute;inset:0;z-index:-2;background:var(--pg)}
+.poster::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(0,0,0,.72));}
+.poster .p-title{font-family:var(--serif);font-size:16px;line-height:1.05;letter-spacing:.2px;
+  text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.poster .p-year{font-size:11px;color:rgba(255,255,255,.75);margin-top:3px}
+.poster .p-mark{position:absolute;top:8px;left:8px;font-family:var(--serif);font-size:26px;opacity:.35;color:#fff}
+.poster .badge{
+  position:absolute;top:8px;right:8px;font-size:10px;font-weight:600;letter-spacing:.04em;
+  padding:3px 7px;border-radius:20px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.16);
+}
+.poster .status-dot{position:absolute;bottom:10px;right:10px;display:flex;gap:4px}
+.status-dot span{width:7px;height:7px;border-radius:50%}
+.s-watched{background:var(--success)}
+.s-watch{background:var(--rating)}
+.s-fav{background:var(--accent-soft)}
+
+/* Horizontal shelves */
+.shelf{display:flex;gap:12px;overflow-x:auto;padding:0 var(--pad) 4px;scroll-snap-type:x mandatory}
+.shelf .poster{flex:0 0 118px;scroll-snap-align:start}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 var(--pad)}
+.grid .poster .p-title{font-size:13px}
+
+/* ============ Bottom nav ============ */
+.bottomnav{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  max-width:var(--maxw);margin:0 auto;
+  display:flex;align-items:center;justify-content:space-around;
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+  background:rgba(16,16,16,.86);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);
+}
+.navbtn{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text-faint);
+  font-size:10px;font-weight:500;padding:4px 10px;border-radius:10px;min-width:52px}
+.navbtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7}
+.navbtn.active{color:var(--text-primary)}
+.navbtn.active svg{stroke:var(--accent-soft)}
+.nav-plus{width:46px;height:46px;border-radius:14px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;margin-top:-14px;box-shadow:0 6px 20px rgba(142,31,45,.5)}
+.nav-plus svg{width:26px;height:26px;stroke-width:2}
+
+/* ============ Ne İzlesem flow ============ */
+.flow-head{padding:calc(env(safe-area-inset-top) + 16px) var(--pad) 2px}
+.back{color:var(--text-secondary);font-size:13px;display:inline-flex;align-items:center;gap:6px;padding:6px 0}
+.flow-title{font-family:var(--serif);font-size:32px;margin:6px 0 2px;letter-spacing:.5px}
+.flow-sub{color:var(--text-secondary);font-size:13px;margin:0 0 6px}
+.q-label{font-weight:600;font-size:15px;margin:22px var(--pad) 12px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:10px;padding:0 var(--pad)}
+.chip{
+  padding:11px 18px;border-radius:24px;background:var(--bg-surface);
+  border:1px solid var(--line);color:var(--text-primary);font-size:14px;font-weight:500;
+  transition:transform .12s, background .18s, border-color .18s;
+}
+.chip:active{transform:scale(.95)}
+.chip.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;
+  margin:26px var(--pad) 0;padding:14px 16px;background:var(--bg-surface);
+  border-radius:var(--radius-card);border:1px solid var(--line)}
+.toggle-row .t-label{font-size:14px}
+.toggle-row .t-sub{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.switch{width:46px;height:28px;border-radius:20px;background:var(--bg-raised);
+  position:relative;flex:none;transition:background .2s;border:1px solid var(--line)}
+.switch.on{background:var(--accent)}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+  background:#fff;transition:transform .2s}
+.switch.on::after{transform:translateX(18px)}
+.flow-cta{padding:26px var(--pad) 10px}
+
+/* info card (the old "API needed" spot, now used for hints) */
+.notice{margin:18px var(--pad) 0;padding:16px;background:var(--bg-surface);
+  border-radius:var(--radius-card);border:1px solid var(--line);color:var(--text-secondary);font-size:13px}
+.notice b{color:var(--text-primary);font-weight:600}
+
+/* ============ Recommendation result ============ */
+.reco-hero{margin:16px var(--pad) 0;border-radius:var(--radius-card);overflow:hidden;
+  border:1px solid var(--line);background:var(--bg-surface)}
+.reco-poster{aspect-ratio:16/10;position:relative;display:flex;align-items:flex-end;padding:18px;color:#fff}
+.reco-poster::before{content:"";position:absolute;inset:0;background:var(--pg)}
+.reco-poster::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.8))}
+.reco-poster>*{position:relative}
+.reco-poster .rp-title{font-family:var(--serif);font-size:30px;line-height:1.02}
+.reco-poster .rp-meta{font-size:12px;color:rgba(255,255,255,.8);margin-top:6px}
+.reco-body{padding:16px}
+.reason{background:var(--bg-raised);border-radius:10px;padding:13px 14px;border:1px solid var(--line)}
+.reason .r-head{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-soft);font-weight:600}
+.reason p{margin:6px 0 0;font-size:13px;color:var(--text-primary);line-height:1.5}
+.alts-title{font-size:12px;color:var(--text-secondary);margin:22px var(--pad) 10px;letter-spacing:.04em}
+
+/* ============ Movie detail (sheet) ============ */
+.overlay{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(2px);display:none;align-items:flex-end;justify-content:center}
+.overlay.active{display:flex;animation:fade .2s ease}
+.sheet{
+  width:100%;max-width:var(--maxw);max-height:92vh;overflow-y:auto;
+  background:var(--bg-primary);border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;
+  animation:slideup .3s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes slideup{from{transform:translateY(100%)}to{transform:none}}
+.sheet-backdrop{height:250px;position:relative;display:flex;align-items:flex-end;padding:18px;color:#fff}
+.sheet-backdrop::before{content:"";position:absolute;inset:0;background:var(--pg)}
+.sheet-backdrop::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,16,16,.15),var(--bg-primary))}
+.sheet-grab{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:42px;height:5px;border-radius:3px;background:rgba(255,255,255,.4)}
+.sheet-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;
+  background:rgba(0,0,0,.45);display:grid;place-items:center;color:#fff;z-index:2}
+.sheet-title-wrap{position:relative}
+.sheet-title{font-family:var(--serif);font-size:30px;line-height:1.02}
+.sheet-meta{font-size:12px;color:rgba(255,255,255,.85);margin-top:6px}
+.sheet-body{padding:18px}
+.action-row{display:flex;gap:10px;margin-bottom:18px}
+.act{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;
+  background:var(--bg-surface);border:1px solid var(--line);border-radius:var(--radius-card);
+  font-size:11px;font-weight:600;color:var(--text-secondary);transition:transform .12s,background .18s,border-color .18s,color .18s}
+.act:active{transform:scale(.95)}
+.act svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7}
+.act.on{color:var(--text-primary)}
+.act.on.watched{border-color:var(--success);color:var(--success)}
+.act.on.watch{border-color:var(--rating);color:var(--rating)}
+.act.on.fav{border-color:var(--accent-soft);color:var(--accent-soft)}
+.act.on svg{fill:currentColor}
+.meta-tags{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 16px}
+.tag{font-size:11px;padding:5px 10px;border-radius:20px;background:var(--bg-raised);color:var(--text-secondary);border:1px solid var(--line)}
+.synopsis{font-size:14px;line-height:1.6;color:var(--text-primary);opacity:.92}
+.detail-h{font-family:var(--serif);font-size:16px;margin:20px 0 8px}
+.status-block{background:var(--bg-surface);border:1px solid var(--line);border-radius:var(--radius-card);padding:14px;margin-top:6px;font-size:13px;color:var(--text-secondary)}
+.stars{display:flex;gap:4px;margin-top:8px}
+.star{width:26px;height:26px;cursor:pointer;color:var(--text-faint)}
+.star.filled{color:var(--rating)}
+.star svg{width:100%;height:100%;fill:currentColor;stroke:none}
+
+/* ============ Library ============ */
+.tabs{display:flex;gap:8px;padding:12px var(--pad) 0;position:sticky;top:0;z-index:5;
+  background:var(--bg-primary)}
+.tab{flex:1;padding:9px 0;text-align:center;font-size:13px;font-weight:600;color:var(--text-secondary);
+  border-radius:10px;background:var(--bg-surface);border:1px solid var(--line)}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.count-pill{font-size:11px;opacity:.7;margin-left:4px}
+
+/* ============ Empty states ============ */
+.empty{padding:60px 30px;text-align:center;color:var(--text-secondary)}
+.empty .em-ico{font-size:40px;opacity:.5;margin-bottom:10px}
+.empty h4{font-family:var(--serif);font-weight:400;font-size:20px;color:var(--text-primary);margin:0 0 6px}
+.empty p{font-size:13px;margin:0 0 18px}
+.empty .btn{max-width:220px;margin:0 auto}
+
+/* Stat cards (profile) */
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 var(--pad)}
+.stat{background:var(--bg-surface);border:1px solid var(--line);border-radius:var(--radius-card);padding:16px}
+.stat .n{font-family:var(--serif);font-size:30px;line-height:1}
+.stat .l{font-size:12px;color:var(--text-secondary);margin-top:4px}
+.profile-head{padding:calc(env(safe-area-inset-top) + 24px) var(--pad) 8px;text-align:center}
+.profile-avatar{width:76px;height:76px;border-radius:50%;margin:0 auto 12px;
+  background:linear-gradient(140deg,#3a2429,#8E1F2D);display:grid;place-items:center;
+  font-size:30px;font-family:var(--serif);color:#fff;border:1px solid var(--line)}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  background:var(--bg-raised);border:1px solid var(--line);color:var(--text-primary);
+  padding:11px 18px;border-radius:24px;font-size:13px;font-weight:500;z-index:80;
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:88%;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Search */
+.searchbar{margin:8px var(--pad) 4px;display:flex;align-items:center;gap:10px;
+  background:var(--bg-raised);border:1px solid var(--line);border-radius:var(--radius-card);padding:12px 14px}
+.searchbar input{flex:1;background:none;border:0;color:var(--text-primary);font-size:15px;outline:none}
+.searchbar svg{width:18px;height:18px;stroke:var(--text-secondary);fill:none;stroke-width:1.8}
+
+@media (max-width:360px){
+  .shelf .poster{flex-basis:104px}
+  .hero h2{font-size:26px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== DISCOVER ===================== -->
+  <section class="screen active" id="screen-discover">
+    <div class="topbar">
+      <div>
+        <div class="brand">KARE<small>.</small></div>
+        <div class="greeting" id="greeting">İyi akşamlar. Bu gece ne izleyeceğiz?</div>
+      </div>
+      <button class="avatar" data-nav="profile" aria-label="Profil">SD</button>
+    </div>
+
+    <div class="hero">
+      <div class="film-strip">▦</div>
+      <div class="kicker">Karar motoru</div>
+      <h2>Ne İzlesem?</h2>
+      <p>Ruh haline, zamanına ve odağına göre üç hızlı seçim — tek, gerekçeli karar.</p>
+      <button class="btn btn-primary" data-nav="flow">Bana bir film seç</button>
+    </div>
+
+    <div class="sec-head"><h3>Bu hafta öne çıkanlar</h3></div>
+    <div class="shelf" id="shelf-featured"></div>
+
+    <div class="sec-head"><h3>Modern klasikler</h3><span class="sub">Küratörlü</span></div>
+    <div class="shelf" id="shelf-classics"></div>
+
+    <div class="sec-head"><h3>Kısa ve tok</h3><span class="sub">2 saatin altı</span></div>
+    <div class="shelf" id="shelf-short"></div>
+
+    <div class="sec-head"><h3>Zihin bükücüler</h3><span class="sub">Düşündürücü</span></div>
+    <div class="shelf" id="shelf-mind"></div>
+    <div class="section-gap"></div>
+  </section>
+
+  <!-- ===================== NE İZLESEM FLOW ===================== -->
+  <section class="screen" id="screen-flow">
+    <div class="flow-head">
+      <button class="back" data-nav="discover">← Keşfet</button>
+      <h1 class="flow-title">NE İZLESEM?</h1>
+      <p class="flow-sub">Üç hızlı seçim. Tek, gerekçeli karar.</p>
+    </div>
+
+    <label class="q-label">Bu akşam nasıl hissetsin?</label>
+    <div class="chips" id="chips-mood"></div>
+
+    <label class="q-label">Ne kadar vaktin var?</label>
+    <div class="chips" id="chips-time"></div>
+
+    <label class="q-label">Ne kadar odaklanmak istersin?</label>
+    <div class="chips" id="chips-focus"></div>
+
+    <div class="toggle-row" id="toggle-unseen">
+      <div>
+        <div class="t-label">Yalnızca izlemediklerim</div>
+        <div class="t-sub">İzledim olarak işaretlediklerini eler</div>
+      </div>
+      <div class="switch on" id="switch-unseen"></div>
+    </div>
+
+    <div class="flow-cta">
+      <button class="btn btn-primary" id="btn-decide">Bana bir film seç</button>
+    </div>
+    <div class="notice" id="flow-notice">
+      <b>Çevrimdışı çalışır.</b> KARE bu sürümde kendi gömülü sinema kataloğunu kullanır — API adresi gerekmez.
+    </div>
+    <div class="section-gap"></div>
+  </section>
+
+  <!-- ===================== RESULT ===================== -->
+  <section class="screen" id="screen-result">
+    <div class="flow-head">
+      <button class="back" data-nav="flow">← Seçimleri değiştir</button>
+      <h1 class="flow-title" style="font-size:26px">Sana bunu seçtik</h1>
+    </div>
+    <div id="result-body"></div>
+    <div class="section-gap"></div>
+  </section>
+
+  <!-- ===================== SEARCH ===================== -->
+  <section class="screen" id="screen-search">
+    <div class="topbar"><div class="brand" style="font-size:22px">Ara</div></div>
+    <div class="searchbar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search-input" placeholder="Film, yönetmen veya tür ara…" autocomplete="off" />
+    </div>
+    <div class="grid" id="search-results" style="margin-top:14px"></div>
+    <div id="search-empty" class="empty" style="display:none">
+      <div class="em-ico">🔍</div><h4>Sonuç yok</h4><p>Başka bir başlık dene.</p>
+    </div>
+    <div class="section-gap"></div>
+  </section>
+
+  <!-- ===================== LIBRARY ===================== -->
+  <section class="screen" id="screen-library">
+    <div class="topbar"><div class="brand" style="font-size:22px">Kütüphanem</div></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="watched">İzlediklerim</button>
+      <button class="tab" data-tab="watch">İzleyeceklerim</button>
+      <button class="tab" data-tab="fav">Favoriler</button>
+    </div>
+    <div id="library-body" style="margin-top:16px"></div>
+    <div class="section-gap"></div>
+  </section>
+
+  <!-- ===================== PROFILE ===================== -->
+  <section class="screen" id="screen-profile">
+    <div class="profile-head">
+      <div class="profile-avatar">S</div>
+      <div class="brand" style="font-size:22px">Sinefil</div>
+      <div class="greeting" id="profile-sub">Kişisel sinema kütüphanen</div>
+    </div>
+    <div class="section-gap" style="height:14px"></div>
+    <div class="stat-grid" id="profile-stats"></div>
+    <div class="sec-head"><h3>Son izlediklerin</h3></div>
+    <div class="shelf" id="profile-recent"></div>
+    <div class="sec-head"><h3>Favorilerin</h3></div>
+    <div class="shelf" id="profile-fav"></div>
+    <div class="section-gap"></div>
+  </section>
+
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <nav class="bottomnav">
+    <button class="navbtn active" data-nav="discover">
+      <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/></svg>
+      Keşfet
+    </button>
+    <button class="navbtn" data-nav="library">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="16" rx="1"/><rect x="13" y="4" width="7" height="16" rx="1"/></svg>
+      Kütüphanem
+    </button>
+    <button class="nav-plus" data-nav="search" aria-label="Ara / Ekle">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="navbtn" data-nav="flow">
+      <svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
+      Ne İzlesem
+    </button>
+    <button class="navbtn" data-nav="profile">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.5 3.6-6 8-6s8 2.5 8 6"/></svg>
+      Profil
+    </button>
+  </nav>
+</div>
+
+<!-- ===================== DETAIL SHEET ===================== -->
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   KARE — self-contained cinema catalog (no API).
+   Curated set of widely-known films with real metadata used to power
+   the "Ne İzlesem?" decision engine, library and discovery — offline.
+===================================================================== */
+const CATALOG = [
+  {id:1, t:"Whiplash", y:2014, r:106, d:"Damien Chazelle", g:["Dram","Müzik"], m:["gerilimli","dusundurucu"], f:"yogun", s:"Genç bir davulcu, mükemmelliği acımasız bir hocanın baskısı altında kovalar."},
+  {id:2, t:"La La Land", y:2016, r:128, d:"Damien Chazelle", g:["Romantik","Müzikal"], m:["romantik","eglenceli"], f:"orta", s:"Bir müzisyen ile bir oyuncu, hayalleri ile aşkları arasında sıkışır."},
+  {id:3, t:"Parazit", y:2019, r:132, d:"Bong Joon-ho", g:["Dram","Gerilim"], m:["karanlik","gerilimli","dusundurucu"], f:"yogun", s:"Yoksul bir aile, zengin bir hanenin hayatına usulca sızar."},
+  {id:4, t:"The Grand Budapest Hotel", y:2014, r:99, d:"Wes Anderson", g:["Komedi","Macera"], m:["eglenceli"], f:"orta", s:"Efsanevi bir otel kâhyası ve genç çırağının simetrik, hızlı macerası."},
+  {id:5, t:"Blade Runner 2049", y:2017, r:164, d:"Denis Villeneuve", g:["Bilim Kurgu"], m:["dusundurucu","karanlik"], f:"yogun", s:"Bir blade runner, insanlığın geleceğini sarsacak bir sırrı ortaya çıkarır."},
+  {id:6, t:"Amélie", y:2001, r:122, d:"Jean-Pierre Jeunet", g:["Romantik","Komedi"], m:["sakin","romantik","eglenceli"], f:"kolay", s:"Paris'te utangaç bir garson, başkalarının hayatını gizlice güzelleştirir."},
+  {id:7, t:"Interstellar", y:2014, r:169, d:"Christopher Nolan", g:["Bilim Kurgu"], m:["dusundurucu"], f:"yogun", s:"Bir grup kâşif, insanlığı kurtarmak için solucan deliğinden geçer."},
+  {id:8, t:"The Dark Knight", y:2008, r:152, d:"Christopher Nolan", g:["Aksiyon","Gerilim"], m:["karanlik","gerilimli"], f:"orta", s:"Batman, kaosu bir sanata dönüştüren Joker ile yüzleşir."},
+  {id:9, t:"Ruhların Kaçışı", y:2001, r:125, d:"Hayao Miyazaki", g:["Animasyon","Fantastik"], m:["sakin","dusundurucu"], f:"kolay", s:"Bir kız çocuğu, ruhlarla dolu büyülü bir dünyada ailesini kurtarmaya çalışır."},
+  {id:10, t:"Pulp Fiction", y:1994, r:154, d:"Quentin Tarantino", g:["Suç","Dram"], m:["karanlik","eglenceli"], f:"orta", s:"Kesişen suç hikâyeleri, alışılmadık bir sırayla iç içe geçer."},
+  {id:11, t:"Sil Baştan", y:2004, r:108, d:"Michel Gondry", g:["Romantik","Bilim Kurgu"], m:["romantik","dusundurucu"], f:"orta", s:"Bir çift, birbirlerine dair anıları sildirince aşkın izini yeniden sürer."},
+  {id:12, t:"Mad Max: Fury Road", y:2015, r:120, d:"George Miller", g:["Aksiyon"], m:["eglenceli","gerilimli"], f:"orta", s:"Çöl kıyametinde durmak bilmeyen, kükreyen bir kaçış kovalamacası."},
+  {id:13, t:"Her", y:2013, r:126, d:"Spike Jonze", g:["Romantik","Bilim Kurgu"], m:["romantik","dusundurucu","sakin"], f:"orta", s:"Yalnız bir adam, yapay zekâ bir işletim sistemine âşık olur."},
+  {id:14, t:"No Country for Old Men", y:2007, r:122, d:"Coen Kardeşler", g:["Suç","Gerilim"], m:["karanlik","gerilimli"], f:"yogun", s:"Bir çanta dolusu para, soğukkanlı bir katili peşe takar."},
+  {id:15, t:"Call Me by Your Name", y:2017, r:132, d:"Luca Guadagnino", g:["Romantik","Dram"], m:["romantik","sakin"], f:"kolay", s:"İtalya'da bir yaz, ilk aşkın ağır ve güzel bir hatırasına dönüşür."},
+  {id:16, t:"Get Out", y:2017, r:104, d:"Jordan Peele", g:["Korku","Gerilim"], m:["gerilimli","karanlik"], f:"orta", s:"Bir genç, sevgilisinin ailesini ziyaretinde tekinsiz bir gerçekle yüzleşir."},
+  {id:17, t:"Esaretin Bedeli", y:1994, r:142, d:"Frank Darabont", g:["Dram"], m:["dusundurucu"], f:"orta", s:"Haksız yere hapse düşen bir adam, umudu yıllar boyunca sessizce diri tutar."},
+  {id:18, t:"Inception", y:2010, r:148, d:"Christopher Nolan", g:["Bilim Kurgu","Aksiyon"], m:["gerilimli","dusundurucu"], f:"yogun", s:"Rüya içinde rüyaya inen hırsızlar, bir fikri zihne eker."},
+  {id:19, t:"Moonlight", y:2016, r:111, d:"Barry Jenkins", g:["Dram"], m:["sakin","dusundurucu"], f:"orta", s:"Bir adamın çocukluktan olgunluğa uzanan kimlik arayışı üç perdede."},
+  {id:20, t:"Drive", y:2011, r:100, d:"Nicolas Winding Refn", g:["Suç","Dram"], m:["karanlik","romantik"], f:"orta", s:"Suskun bir kaçış şoförü, bir komşusu için tehlikeye atılır."},
+  {id:21, t:"The Social Network", y:2010, r:120, d:"David Fincher", g:["Dram"], m:["dusundurucu","gerilimli"], f:"orta", s:"Bir üniversite projesinin dünya çapında bir imparatorluğa ve ihanete dönüşü."},
+  {id:22, t:"Little Miss Sunshine", y:2006, r:101, d:"Dayton & Faris", g:["Komedi","Dram"], m:["eglenceli","sakin"], f:"kolay", s:"Dağınık bir aile, minik bir güzellik yarışması için sarı bir minibüse doluşur."},
+  {id:23, t:"Oldboy", y:2003, r:120, d:"Park Chan-wook", g:["Suç","Gerilim"], m:["karanlik","gerilimli"], f:"yogun", s:"On beş yıl sebepsizce hapsedilen bir adam, intikam için serbest bırakılır."},
+  {id:24, t:"Before Sunrise", y:1995, r:101, d:"Richard Linklater", g:["Romantik"], m:["romantik","sakin"], f:"kolay", s:"İki yabancı, Viyana'da tek bir gece boyunca yürüyerek âşık olur."},
+  {id:25, t:"Geliş", y:2016, r:116, d:"Denis Villeneuve", g:["Bilim Kurgu","Dram"], m:["dusundurucu","sakin"], f:"yogun", s:"Bir dilbilimci, dünyaya inen uzaylılarla iletişim kurmaya çalışır."},
+  {id:26, t:"Portrait of a Lady on Fire", y:2019, r:122, d:"Céline Sciamma", g:["Romantik","Dram"], m:["romantik","sakin","dusundurucu"], f:"orta", s:"Bir ressam ile modeli arasında, bir ada evinde sessiz bir tutku doğar."},
+  {id:27, t:"Se7en", y:1995, r:127, d:"David Fincher", g:["Suç","Gerilim"], m:["karanlik","gerilimli"], f:"yogun", s:"İki dedektif, yedi ölümcül günah üzerine kurulu bir cinayet dizisini çözer."},
+  {id:28, t:"Coco", y:2017, r:105, d:"Lee Unkrich", g:["Animasyon","Aile"], m:["eglenceli","sakin"], f:"kolay", s:"Müziğe âşık bir çocuk, Ölüler Diyarı'nda ailesinin sırrını arar."},
+  {id:29, t:"There Will Be Blood", y:2007, r:158, d:"Paul Thomas Anderson", g:["Dram"], m:["karanlik","dusundurucu"], f:"yogun", s:"Hırslı bir petrolcü, servet uğruna insanlığını yavaşça tüketir."},
+  {id:30, t:"The Truman Show", y:1998, r:103, d:"Peter Weir", g:["Dram","Komedi"], m:["dusundurucu","eglenceli"], f:"kolay", s:"Bir adam, tüm hayatının bir televizyon programı olduğunu keşfeder."},
+  {id:31, t:"Gone Girl", y:2014, r:149, d:"David Fincher", g:["Gerilim","Suç"], m:["gerilimli","karanlik"], f:"orta", s:"Bir kadının kaybolması, kusursuz bir evliliğin karanlığını açığa çıkarır."},
+  {id:32, t:"Roma", y:2018, r:135, d:"Alfonso Cuarón", g:["Dram"], m:["sakin","dusundurucu"], f:"yogun", s:"1970'ler Meksika'sında bir evin yardımcısının sakin, dokunaklı bir yılı."},
+  {id:33, t:"Knives Out", y:2019, r:130, d:"Rian Johnson", g:["Suç","Komedi"], m:["eglenceli","gerilimli"], f:"orta", s:"Zeki bir dedektif, zengin bir ailenin ölümündeki düğümü çözer."},
+  {id:34, t:"Yüzüklerin Efendisi: Yüzük Kardeşliği", y:2001, r:178, d:"Peter Jackson", g:["Fantastik","Macera"], m:["eglenceli","dusundurucu"], f:"orta", s:"Küçük bir hobbit, dünyayı kurtaracak bir yüzüğü yok etme yoluna çıkar."},
+  {id:35, t:"2001: A Space Odyssey", y:1968, r:149, d:"Stanley Kubrick", g:["Bilim Kurgu"], m:["dusundurucu"], f:"yogun", s:"İnsanlığın evrimi ve yapay zekâ üzerine sessiz, görkemli bir düşünce."},
+  {id:36, t:"Lost in Translation", y:2003, r:102, d:"Sofia Coppola", g:["Dram","Romantik"], m:["sakin","romantik","dusundurucu"], f:"kolay", s:"Tokyo'da iki yabancı, uykusuz gecelerde beklenmedik bir yakınlık kurar."},
+  {id:37, t:"Prisoners", y:2013, r:153, d:"Denis Villeneuve", g:["Gerilim","Suç"], m:["gerilimli","karanlik"], f:"yogun", s:"Kızı kaybolan bir baba, adaletle çaresizlik arasında ince bir çizgide yürür."},
+  {id:38, t:"The Handmaiden", y:2016, r:145, d:"Park Chan-wook", g:["Dram","Gerilim"], m:["romantik","gerilimli","karanlik"], f:"yogun", s:"Bir dolandırıcılık planı, beklenmedik bir tutkuya ve entrikaya dönüşür."},
+  {id:39, t:"Oyuncak Hikayesi", y:1995, r:81, d:"John Lasseter", g:["Animasyon","Aile"], m:["eglenceli","sakin"], f:"kolay", s:"Oyuncaklar, sahiplerinin gözünden uzakta kendi dünyalarında yaşar."},
+  {id:40, t:"Dune", y:2021, r:155, d:"Denis Villeneuve", g:["Bilim Kurgu"], m:["dusundurucu","gerilimli"], f:"yogun", s:"Genç bir soylu, çöl gezegeninin kaderini omuzlamak zorunda kalır."},
+  {id:41, t:"Past Lives", y:2023, r:105, d:"Celine Song", g:["Romantik","Dram"], m:["romantik","sakin","dusundurucu"], f:"kolay", s:"Çocukluk aşkı iki insan, yıllar sonra bir 'ya olsaydı' gecesinde buluşur."},
+  {id:42, t:"Everything Everywhere All at Once", y:2022, r:139, d:"Daniels", g:["Bilim Kurgu","Komedi"], m:["eglenceli","dusundurucu"], f:"yogun", s:"Sıradan bir kadın, paralel evrenler arasında ailesini kurtarmaya çalışır."},
+  {id:43, t:"Blade Runner", y:1982, r:117, d:"Ridley Scott", g:["Bilim Kurgu"], m:["dusundurucu","karanlik"], f:"orta", s:"Bir avcı, insan gibi hisseden replika'ların peşine düşer."},
+  {id:44, t:"Chungking Express", y:1994, r:102, d:"Wong Kar-wai", g:["Romantik","Dram"], m:["romantik","sakin"], f:"orta", s:"Hong Kong'da iki polisin yalnızlığı ve tesadüfi aşkları kesişir."},
+  {id:45, t:"Nightcrawler", y:2014, r:118, d:"Dan Gilroy", g:["Suç","Gerilim"], m:["karanlik","gerilimli"], f:"orta", s:"Hırslı bir kameraman, gece haberciliğinde etik sınırları teker teker aşar."},
+  {id:46, t:"Green Book", y:2018, r:130, d:"Peter Farrelly", g:["Dram","Komedi"], m:["sakin","eglenceli"], f:"kolay", s:"Bir şoför ile bir piyanist, güneydeki turnede beklenmedik bir dostluk kurar."},
+  {id:47, t:"Ex Machina", y:2014, r:108, d:"Alex Garland", g:["Bilim Kurgu","Gerilim"], m:["gerilimli","dusundurucu"], f:"yogun", s:"Bir programcı, insansı bir yapay zekânın bilincini sınamaya çağrılır."},
+  {id:48, t:"In the Mood for Love", y:2000, r:98, d:"Wong Kar-wai", g:["Romantik","Dram"], m:["romantik","sakin"], f:"orta", s:"Komşu iki insan, eşlerinin ihanetiyle yüzleşirken birbirine tutulur."}
+];
+
+/* Poster gradient palettes — deterministic, editorial cinema look */
+const PALETTES = [
+  ["#2b1a1d","#8E1F2D"], ["#12222b","#2e6f7a"], ["#231a2e","#6b4a8f"],
+  ["#2b2410","#a98527"], ["#101f18","#2f7d5b"], ["#2a1512","#c1502e"],
+  ["#171b2b","#3f5aa6"], ["#261722","#a63e6e"], ["#1d1d22","#5b6472"],
+  ["#28190f","#b3701f"], ["#0f1f22","#2b8a8f"], ["#221016","#9a2846"]
+];
+function palette(id){ return PALETTES[id % PALETTES.length]; }
+function grad(id){ const [a,b]=palette(id); return `linear-gradient(150deg,${a},${b})`; }
+
+/* Localized labels */
+const MOOD_LABELS = {sakin:"Sakin", eglenceli:"Eğlenceli", karanlik:"Karanlık", romantik:"Romantik", gerilimli:"Gerilimli", dusundurucu:"Düşündürücü"};
+const FOCUS_LABELS = {kolay:"Kolay", orta:"Orta", yogun:"Yoğun"};
+const TIME_LABELS = {kisa:"Kısa", normal:"Normal", uzun:"Uzun"};
+function timeBucket(r){ return r<=105?"kisa":(r>140?"uzun":"normal"); }
+function fmtRuntime(r){ const h=Math.floor(r/60), m=r%60; return h?`${h} sa ${m} dk`:`${m} dk`; }
+
+/* ================= State (persisted, no server) ================= */
+const LS_KEY = "kare_state_v1";
+let STATE = loadState();
+function loadState(){
+  try{ const s=JSON.parse(localStorage.getItem(LS_KEY)); if(s && s.status) return s; }catch(e){}
+  return {status:{}, ratings:{}}; // status[id] = 'watched' | 'watch'; fav[id] separate flag inside
+}
+function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(STATE)); }catch(e){} }
+function st(id){ return STATE.status[id] || {}; }
+function setStatus(id, key, val){
+  const cur = STATE.status[id] || {};
+  cur[key] = val; STATE.status[id]=cur; saveState();
+}
+
+/* ================= View router ================= */
+const screens = {
+  discover:"screen-discover", flow:"screen-flow", result:"screen-result",
+  search:"screen-search", library:"screen-library", profile:"screen-profile"
+};
+function nav(name){
+  Object.values(screens).forEach(id=>document.getElementById(id).classList.remove("active"));
+  document.getElementById(screens[name]).classList.add("active");
+  // bottom nav highlight
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.remove("active"));
+  const map={discover:0,library:1,search:2,flow:3,profile:4};
+  const btns=document.querySelectorAll(".bottomnav > button");
+  document.querySelectorAll(".navbtn").forEach((b)=>{ if(b.dataset.nav===name) b.classList.add("active"); });
+  window.scrollTo(0,0);
+  if(name==="library") renderLibrary();
+  if(name==="profile") renderProfile();
+  if(name==="search"){ setTimeout(()=>document.getElementById("search-input").focus(),200); }
+}
+document.addEventListener("click", e=>{
+  const el = e.target.closest("[data-nav]");
+  if(el){ nav(el.dataset.nav); }
+});
+
+/* ================= Poster builder ================= */
+function posterEl(film, opts={}){
+  const el = document.createElement("button");
+  el.className="poster";
+  el.style.setProperty("--pg", grad(film.id));
+  const status = st(film.id);
+  let dots="";
+  if(status.s==="watched") dots+='<span class="s-watched"></span>';
+  if(status.s==="watch") dots+='<span class="s-watch"></span>';
+  if(status.fav) dots+='<span class="s-fav"></span>';
+  el.innerHTML = `
+    <div class="p-mark">◼</div>
+    ${opts.badge?`<span class="badge">${opts.badge}</span>`:""}
+    <div class="p-title">${film.t}</div>
+    <div class="p-year">${film.y} · ${fmtRuntime(film.r)}</div>
+    ${dots?`<div class="status-dot">${dots}</div>`:""}
+  `;
+  el.addEventListener("click",()=>openDetail(film.id));
+  el.setAttribute("aria-label", `${film.t} (${film.y})`);
+  return el;
+}
+function fillShelf(id, films, opts={}){
+  const c=document.getElementById(id); c.innerHTML="";
+  films.forEach(f=>c.appendChild(posterEl(f,opts)));
+}
+function fillGrid(id, films){
+  const c=document.getElementById(id); c.innerHTML="";
+  films.forEach(f=>c.appendChild(posterEl(f)));
+}
+
+/* ================= Discover ================= */
+function byId(id){ return CATALOG.find(f=>f.id===id); }
+function renderDiscover(){
+  const featured=[3,42,40,26,13,33].map(byId);
+  fillShelf("shelf-featured", featured, {badge:"Öne çıkan"});
+  const classics=[10,17,35,43,8,29,48].map(byId);
+  fillShelf("shelf-classics", classics);
+  const short=CATALOG.filter(f=>f.r<=110).slice(0,8);
+  fillShelf("shelf-short", short);
+  const mind=CATALOG.filter(f=>f.m.includes("dusundurucu")).slice(0,8);
+  fillShelf("shelf-mind", mind);
+  // greeting by time
+  const h=new Date().getHours();
+  const g = h<6?"İyi geceler.":h<12?"Günaydın.":h<18?"İyi günler.":"İyi akşamlar.";
+  document.getElementById("greeting").textContent = `${g} Bu gece ne izleyeceğiz?`;
+}
+
+/* ================= Ne İzlesem flow ================= */
+let SEL = {mood:null, time:null, focus:null, unseen:true};
+function buildChips(){
+  const mood=document.getElementById("chips-mood"); mood.innerHTML="";
+  ["sakin","eglenceli","karanlik","romantik","gerilimli","dusundurucu"].forEach(k=>{
+    mood.appendChild(chip(MOOD_LABELS[k], ()=>{SEL.mood=SEL.mood===k?null:k; refreshChips();}, ()=>SEL.mood===k));
+  });
+  const time=document.getElementById("chips-time"); time.innerHTML="";
+  ["kisa","normal","uzun"].forEach(k=>{
+    time.appendChild(chip(TIME_LABELS[k], ()=>{SEL.time=SEL.time===k?null:k; refreshChips();}, ()=>SEL.time===k));
+  });
+  const focus=document.getElementById("chips-focus"); focus.innerHTML="";
+  ["kolay","orta","yogun"].forEach(k=>{
+    focus.appendChild(chip(FOCUS_LABELS[k], ()=>{SEL.focus=SEL.focus===k?null:k; refreshChips();}, ()=>SEL.focus===k));
+  });
+  refreshChips();
+}
+function chip(label, onClick, isSel){
+  const b=document.createElement("button");
+  b.className="chip"; b.textContent=label; b._sel=isSel; b.onclick=onClick;
+  return b;
+}
+function refreshChips(){
+  document.querySelectorAll(".chips .chip").forEach(b=>{
+    if(b._sel) b.classList.toggle("selected", b._sel());
+  });
+}
+document.getElementById("switch-unseen").addEventListener("click", function(){
+  SEL.unseen=!SEL.unseen; this.classList.toggle("on", SEL.unseen);
+});
+document.getElementById("btn-decide").addEventListener("click", decide);
+
+/* ================= Decision engine ================= */
+function decide(){
+  let pool = CATALOG.slice();
+  if(SEL.unseen) pool = pool.filter(f=> st(f.id).s!=="watched");
+  const scored = pool.map(f=>{
+    let score=0; const reasons=[];
+    if(SEL.mood){ if(f.m.includes(SEL.mood)){ score+=5; reasons.push("mood"); } else score-=3; }
+    if(SEL.focus){ if(f.f===SEL.focus){ score+=3; reasons.push("focus"); }
+      else { const order=["kolay","orta","yogun"]; const diff=Math.abs(order.indexOf(f.f)-order.indexOf(SEL.focus)); score-= diff; } }
+    if(SEL.time){ if(timeBucket(f.r)===SEL.time){ score+=3; reasons.push("time"); } else score-=1.5; }
+    if(st(f.id).fav) score+=0.5;
+    score += (f.id%7)/20; // gentle deterministic tie-break variety
+    return {f, score, reasons};
+  }).sort((a,b)=>b.score-a.score);
+
+  const top = scored.slice(0,3).filter((x,i)=> i===0 || x.score>-2);
+  renderResult(top);
+  nav("result");
+}
+function reasonText(entry){
+  const {f, reasons}=entry;
+  const parts=[];
+  if(reasons.includes("mood")) parts.push(`bu akşamki <b>${MOOD_LABELS[SEL.mood].toLowerCase()}</b> ruh haline yakın`);
+  if(reasons.includes("time")) parts.push(`süresi (${fmtRuntime(f.r)}) <b>${TIME_LABELS[SEL.time].toLowerCase()}</b> tercihine uyuyor`);
+  if(reasons.includes("focus")) parts.push(`<b>${FOCUS_LABELS[f.f].toLowerCase()}</b> bir odak istiyor`);
+  if(!parts.length) parts.push(`geniş beğeni toplamış, güvenli bir seçim`);
+  let base = `${f.d} imzalı bu ${f.g[0].toLowerCase()} filmini seçtik çünkü ` + parts.join("; ") + ".";
+  if(st(f.id).fav) base += " Ayrıca favorilerinde.";
+  return base;
+}
+function renderResult(list){
+  const body=document.getElementById("result-body");
+  if(!list.length){
+    body.innerHTML = `<div class="empty" style="padding:50px 30px">
+      <div class="em-ico">🎬</div><h4>Bu kombinasyona tam uyan yok</h4>
+      <p>Seçimlerini biraz gevşetmeyi dene.</p></div>`;
+    return;
+  }
+  const top=list[0];
+  let html = `<div class="reco-hero">
+    <div class="reco-poster" style="--pg:${grad(top.f.id)}">
+      <div>
+        <div class="rp-title">${top.f.t}</div>
+        <div class="rp-meta">${top.f.y} · ${fmtRuntime(top.f.r)} · ${top.f.d}</div>
+      </div>
+    </div>
+    <div class="reco-body">
+      <div class="reason">
+        <div class="r-head">Neden bunu seçtik?</div>
+        <p>${reasonText(top)}</p>
+      </div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-primary" onclick="openDetail(${top.f.id})">Detay & Kaydet</button>
+        <button class="btn btn-secondary" style="max-width:150px" onclick="quickWatchlist(${top.f.id})">İzleme listeme</button>
+      </div>
+    </div>
+  </div>`;
+
+  if(list.length>1){
+    html += `<div class="alts-title">Alternatifler</div><div class="grid" id="reco-alts"></div>`;
+  }
+  html += `<div class="flow-cta"><button class="btn btn-secondary" onclick="decide()">Başka bir set öner</button></div>`;
+  body.innerHTML=html;
+  if(list.length>1){
+    const g=document.getElementById("reco-alts");
+    list.slice(1).forEach(x=>g.appendChild(posterEl(x.f)));
+  }
+}
+function quickWatchlist(id){
+  setStatus(id,"s","watch");
+  toast(`“${byId(id).t}” izleme listene eklendi`);
+  if(document.getElementById("screen-result").classList.contains("active")) renderResult2Refresh();
+}
+function renderResult2Refresh(){ /* refresh dots on result posters */ decideRefreshDots(); }
+function decideRefreshDots(){ /* no-op placeholder to keep result simple */ }
+
+/* ================= Detail sheet ================= */
+const overlay=document.getElementById("overlay");
+const sheet=document.getElementById("sheet");
+let CUR_ID=null;
+function openDetail(id){
+  CUR_ID=id; const f=byId(id); const status=st(id);
+  const rating=STATE.ratings[id]||0;
+  sheet.innerHTML = `
+    <div class="sheet-title-wrap">
+      <div class="sheet-backdrop" style="--pg:${grad(id)}">
+        <div class="sheet-grab"></div>
+        <button class="sheet-close" onclick="closeDetail()" aria-label="Kapat">✕</button>
+        <div>
+          <div class="sheet-title">${f.t}</div>
+          <div class="sheet-meta">${f.y} · ${fmtRuntime(f.r)} · ${f.d}</div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-body">
+      <div class="action-row">
+        <button class="act watched ${status.s==="watched"?"on":""}" onclick="toggleWatched(${id})">
+          <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>İzledim
+        </button>
+        <button class="act watch ${status.s==="watch"?"on":""}" onclick="toggleWatch(${id})">
+          <svg viewBox="0 0 24 24"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>İzleyeceğim
+        </button>
+        <button class="act fav ${status.fav?"on":""}" onclick="toggleFav(${id})">
+          <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 2.5 5 6 5c2 0 3.2 1.2 4 2.3C10.8 6.2 12 5 14 5c3.5 0 5.5 3.5 3.5 7.5C19 16.65 12 21 12 21z"/></svg>Favori
+        </button>
+      </div>
+      <div class="meta-tags">
+        ${f.g.map(g=>`<span class="tag">${g}</span>`).join("")}
+        <span class="tag">${FOCUS_LABELS[f.f]} odak</span>
+        ${f.m.map(m=>`<span class="tag">${MOOD_LABELS[m]}</span>`).join("")}
+      </div>
+      <div class="synopsis">${f.s}</div>
+
+      <div id="status-block-wrap">${statusBlock(id)}</div>
+
+      <div class="detail-h">Puanın</div>
+      <div class="stars" id="stars">${starsHTML(rating)}</div>
+    </div>`;
+  overlay.classList.add("active");
+  document.body.style.overflow="hidden";
+  bindStars(id);
+}
+function statusBlock(id){
+  const status=st(id); const rating=STATE.ratings[id]||0;
+  if(!status.s && !status.fav && !rating) return "";
+  let lines=[];
+  if(status.s==="watched") lines.push("✓ İzledin");
+  if(status.s==="watch") lines.push("◷ İzleme listende");
+  if(status.fav) lines.push("♥ Favorilerinde");
+  if(rating) lines.push(`★ ${rating.toFixed(1)} verdin`);
+  return `<div class="detail-h">Senin durumun</div>
+    <div class="status-block">${lines.join(" · ")}</div>`;
+}
+function starsHTML(rating){
+  let html="";
+  for(let i=1;i<=5;i++){
+    const filled = rating>=i-0.0 ? "filled" : "";
+    html+=`<span class="star ${rating>=i?"filled":(rating>=i-0.5?"filled":"")}" data-val="${i}">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.8 5.9 20.4l1.4-6.8L2.2 9l6.9-.7z"/></svg></span>`;
+  }
+  return html;
+}
+function bindStars(id){
+  const wrap=document.getElementById("stars");
+  wrap.querySelectorAll(".star").forEach(star=>{
+    star.addEventListener("click", ev=>{
+      const rect=star.getBoundingClientRect();
+      const half = (ev.clientX-rect.left) < rect.width/2;
+      const val=parseInt(star.dataset.val) - (half?0.5:0);
+      STATE.ratings[id]=val; saveState();
+      // auto-mark watched when rated
+      if(st(id).s!=="watched"){ setStatus(id,"s","watched"); }
+      paintStars(val);
+      document.getElementById("status-block-wrap").innerHTML=statusBlock(id);
+      refreshActionRow(id);
+      toast(`Puanın kaydedildi: ${val.toFixed(1)} ★`);
+    });
+  });
+}
+function paintStars(val){
+  document.querySelectorAll("#stars .star").forEach(s=>{
+    const v=parseInt(s.dataset.val);
+    s.classList.toggle("filled", val>=v-0.5);
+  });
+}
+function refreshActionRow(id){
+  const status=st(id);
+  const row=document.querySelector(".action-row");
+  if(!row) return;
+  row.querySelector(".watched").classList.toggle("on", status.s==="watched");
+  row.querySelector(".watch").classList.toggle("on", status.s==="watch");
+  row.querySelector(".fav").classList.toggle("on", !!status.fav);
+}
+function toggleWatched(id){
+  const cur=st(id);
+  setStatus(id,"s", cur.s==="watched"?null:"watched");
+  refreshActionRow(id); document.getElementById("status-block-wrap").innerHTML=statusBlock(id);
+  toast(st(id).s==="watched"?`“${byId(id).t}” izlendi olarak işaretlendi`:"İşaret kaldırıldı");
+}
+function toggleWatch(id){
+  const cur=st(id);
+  setStatus(id,"s", cur.s==="watch"?null:"watch");
+  refreshActionRow(id); document.getElementById("status-block-wrap").innerHTML=statusBlock(id);
+  toast(st(id).s==="watch"?`“${byId(id).t}” izleme listende`:"Listeden çıkarıldı");
+}
+function toggleFav(id){
+  const cur=STATE.status[id]||{};
+  cur.fav=!cur.fav; STATE.status[id]=cur; saveState();
+  refreshActionRow(id); document.getElementById("status-block-wrap").innerHTML=statusBlock(id);
+  toast(cur.fav?`“${byId(id).t}” favorilere eklendi`:"Favorilerden çıkarıldı");
+}
+function closeDetail(){
+  overlay.classList.remove("active");
+  document.body.style.overflow="";
+  // refresh visible screens so status dots update
+  renderDiscover();
+  if(document.getElementById("screen-library").classList.contains("active")) renderLibrary();
+  if(document.getElementById("screen-profile").classList.contains("active")) renderProfile();
+  if(document.getElementById("screen-search").classList.contains("active")) runSearch();
+}
+overlay.addEventListener("click", e=>{ if(e.target===overlay) closeDetail(); });
+
+/* ================= Library ================= */
+let CUR_TAB="watched";
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active"); CUR_TAB=t.dataset.tab; renderLibrary();
+  });
+});
+function libFilms(tab){
+  if(tab==="fav") return CATALOG.filter(f=> (STATE.status[f.id]||{}).fav);
+  return CATALOG.filter(f=> st(f.id).s===tab);
+}
+function renderLibrary(){
+  const films=libFilms(CUR_TAB);
+  const body=document.getElementById("library-body");
+  // update counts on tabs
+  document.querySelectorAll(".tab").forEach(t=>{
+    const n=libFilms(t.dataset.tab).length;
+    const label={watched:"İzlediklerim",watch:"İzleyeceklerim",fav:"Favoriler"}[t.dataset.tab];
+    t.innerHTML = `${label}${n?`<span class="count-pill">${n}</span>`:""}`;
+  });
+  if(!films.length){
+    const cfg={
+      watched:{i:"🎞️",h:"Henüz film eklemedin",p:"İzlediğin ilk filmi işaretle.",b:"Film keşfet",n:"discover"},
+      watch:{i:"🍿",h:"İzleme listen boş",p:"Ne İzlesem? sana bir başlangıç önersin.",b:"Bana bir film seç",n:"flow"},
+      fav:{i:"♥",h:"Favori yok",p:"Sevdiğin filmleri kalple işaretle.",b:"Keşfet",n:"discover"}
+    }[CUR_TAB];
+    body.innerHTML=`<div class="empty"><div class="em-ico">${cfg.i}</div>
+      <h4>${cfg.h}</h4><p>${cfg.p}</p>
+      <button class="btn btn-primary" data-nav="${cfg.n}">${cfg.b}</button></div>`;
+    return;
+  }
+  body.innerHTML=`<div class="grid" id="lib-grid"></div>`;
+  const g=document.getElementById("lib-grid");
+  films.forEach(f=>g.appendChild(posterEl(f)));
+}
+
+/* ================= Profile ================= */
+function renderProfile(){
+  const watched=CATALOG.filter(f=>st(f.id).s==="watched");
+  const favs=CATALOG.filter(f=>(STATE.status[f.id]||{}).fav);
+  const rated=Object.keys(STATE.ratings).filter(k=>STATE.ratings[k]>0);
+  const avg = rated.length? (rated.reduce((a,k)=>a+STATE.ratings[k],0)/rated.length):0;
+  const thisYear=watched.length; // simplified activity
+  document.getElementById("profile-sub").textContent = watched.length
+    ? `${watched.length} film · ${favs.length} favori` : "Kütüphanen seni bekliyor";
+  const stats=[
+    {n:watched.length,l:"İzlenen film"},
+    {n:favs.length,l:"Favori"},
+    {n:rated.length,l:"Puanlanan"},
+    {n:avg?avg.toFixed(1):"–",l:"Ort. puan"}
+  ];
+  document.getElementById("profile-stats").innerHTML =
+    stats.map(s=>`<div class="stat"><div class="n">${s.n}</div><div class="l">${s.l}</div></div>`).join("");
+  fillShelf("profile-recent", watched.slice(-8).reverse().length?watched.slice(-8).reverse():[]);
+  if(!watched.length) document.getElementById("profile-recent").innerHTML=`<div style="color:var(--text-faint);font-size:13px;padding:0 16px">Henüz yok.</div>`;
+  fillShelf("profile-fav", favs.slice(0,8));
+  if(!favs.length) document.getElementById("profile-fav").innerHTML=`<div style="color:var(--text-faint);font-size:13px;padding:0 16px">Henüz yok.</div>`;
+}
+
+/* ================= Search ================= */
+const searchInput=document.getElementById("search-input");
+searchInput.addEventListener("input", runSearch);
+function runSearch(){
+  const q=searchInput.value.trim().toLowerCase();
+  let res;
+  if(!q){ res=CATALOG.slice().sort((a,b)=>b.y-a.y); }
+  else res=CATALOG.filter(f=>
+    f.t.toLowerCase().includes(q) || f.d.toLowerCase().includes(q) ||
+    f.g.some(g=>g.toLowerCase().includes(q)) || String(f.y).includes(q));
+  const grid=document.getElementById("search-results");
+  const empty=document.getElementById("search-empty");
+  grid.innerHTML="";
+  if(!res.length){ empty.style.display="block"; return; }
+  empty.style.display="none";
+  res.forEach(f=>grid.appendChild(posterEl(f)));
+}
+
+/* ================= Toast ================= */
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1900);
+}
+
+/* ================= Init ================= */
+renderDiscover();
+buildChips();
+runSearch();
+</script>
+</body>
+</html>
