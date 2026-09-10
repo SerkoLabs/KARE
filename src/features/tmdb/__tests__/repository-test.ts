@@ -20,11 +20,11 @@ const validMovie = {
 };
 
 const originalUrl = process.env.EXPO_PUBLIC_KARE_API_URL;
-const originalFetch = global.fetch;
+const originalFetch = globalThis.fetch;
 
 afterEach(() => {
   process.env.EXPO_PUBLIC_KARE_API_URL = originalUrl;
-  global.fetch = originalFetch;
+  globalThis.fetch = originalFetch;
   jest.useRealTimers();
   jest.restoreAllMocks();
 });
@@ -38,7 +38,7 @@ test('fails explicitly when the API boundary is not configured', async () => {
 
 test('maps a valid normalized provider response', async () => {
   process.env.EXPO_PUBLIC_KARE_API_URL = 'https://api.example.test/';
-  global.fetch = jest.fn().mockResolvedValue({
+  globalThis.fetch = jest.fn().mockResolvedValue({
     ok: true,
     status: 200,
     json: async () => ({ movies: [validMovie] }),
@@ -47,7 +47,7 @@ test('maps a valid normalized provider response', async () => {
   await expect(discoverMovies(input)).resolves.toEqual([
     expect.objectContaining({ tmdbId: 550, title: 'Fight Club' }),
   ]);
-  expect(global.fetch).toHaveBeenCalledWith(
+  expect(globalThis.fetch).toHaveBeenCalledWith(
     expect.stringContaining('https://api.example.test/tmdb-discover?'),
     expect.objectContaining({ headers: { Accept: 'application/json' } }),
   );
@@ -56,7 +56,7 @@ test('maps a valid normalized provider response', async () => {
 test('retries one transient provider failure then succeeds', async () => {
   jest.useFakeTimers();
   process.env.EXPO_PUBLIC_KARE_API_URL = 'https://api.example.test';
-  global.fetch = jest
+  globalThis.fetch = jest
     .fn()
     .mockResolvedValueOnce({ ok: false, status: 503 })
     .mockResolvedValueOnce({
@@ -66,27 +66,29 @@ test('retries one transient provider failure then succeeds', async () => {
     });
 
   const request = discoverMovies(input);
+  const assertion = expect(request).resolves.toHaveLength(1);
   await jest.advanceTimersByTimeAsync(200);
-  await expect(request).resolves.toHaveLength(1);
-  expect(global.fetch).toHaveBeenCalledTimes(2);
+  await assertion;
+  expect(globalThis.fetch).toHaveBeenCalledTimes(2);
 });
 
 test('reports an upstream error after bounded 429 retries', async () => {
   jest.useFakeTimers();
   process.env.EXPO_PUBLIC_KARE_API_URL = 'https://api.example.test';
-  global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 429 });
+  globalThis.fetch = jest.fn().mockResolvedValue({ ok: false, status: 429 });
 
   const request = discoverMovies(input);
-  await jest.advanceTimersByTimeAsync(200);
-  await expect(request).rejects.toEqual(
+  const assertion = expect(request).rejects.toEqual(
     expect.objectContaining<Partial<MovieDataError>>({ code: 'upstream' }),
   );
-  expect(global.fetch).toHaveBeenCalledTimes(2);
+  await jest.advanceTimersByTimeAsync(200);
+  await assertion;
+  expect(globalThis.fetch).toHaveBeenCalledTimes(2);
 });
 
 test('distinguishes malformed JSON and empty responses', async () => {
   process.env.EXPO_PUBLIC_KARE_API_URL = 'https://api.example.test';
-  global.fetch = jest.fn().mockResolvedValue({
+  globalThis.fetch = jest.fn().mockResolvedValue({
     ok: true,
     status: 200,
     json: async () => {
@@ -97,7 +99,7 @@ test('distinguishes malformed JSON and empty responses', async () => {
     code: 'invalid-response',
   });
 
-  global.fetch = jest.fn().mockResolvedValue({
+  globalThis.fetch = jest.fn().mockResolvedValue({
     ok: true,
     status: 200,
     json: async () => ({ movies: [] }),
