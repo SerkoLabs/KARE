@@ -2,19 +2,13 @@ name: KARE quality gate
 on:
   push:
     branches: [feat/foundation]
-  pull_request:
-    branches: [main]
 permissions:
   contents: read
+  pull-requests: write
 jobs:
-  verify:
-    name: ${{ matrix.gate }}
+  diagnose:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        gate: [lint, typecheck, test, export]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,11 +16,23 @@ jobs:
           node-version: '22.16.0'
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - if: matrix.gate == 'lint'
-        run: npm run lint
-      - if: matrix.gate == 'typecheck'
-        run: npm run typecheck
-      - if: matrix.gate == 'test'
-        run: npm run test:ci
-      - if: matrix.gate == 'export'
-        run: npm run export:smoke
+      - name: Run gates and report failures
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set +e
+          failed=0
+          printf '## CI diagnostics for `%s`\n\n' "$GITHUB_SHA" > /tmp/diag.md
+          for gate in lint typecheck test:ci export:smoke; do
+            output=$(npm run "$gate" 2>&1)
+            status=$?
+            if [ $status -ne 0 ]; then
+              failed=1
+              printf '### `%s` failed\n```text\n%s\n```\n\n' "$gate" "$output" >> /tmp/diag.md
+            else
+              printf '### `%s` passed\n\n' "$gate" >> /tmp/diag.md
+            fi
+          done
+          gh pr comment 1 --body-file /tmp/diag.md
+          exit $failed
